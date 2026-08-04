@@ -1,0 +1,36 @@
+# Exact direct-dependency constraints for 0.1.0. All development, optional, CI, and
+# container installs consume this file. Transitive hash locking remains a release gate.
+
+aiosqlite==0.20.0
+alembic==1.18.5
+asyncpg==0.30.0
+bandit==1.9.4
+build==1.2.2.post1
+fastapi==0.139.2
+httpx==0.28.1
+hypothesis==6.152.7
+jsonschema==4.26.0
+mypy==1.10.0
+opentelemetry-api==1.31.1
+packaging==25.0
+pathspec==1.1.1
+pip-audit==2.9.0
+pre-commit==4.2.0
+prometheus-client==0.25.0
+psycopg==3.2.9
+psycopg-binary==3.2.9
+pydantic==2.13.4
+pydantic-core==2.46.4
+pydantic-settings==2.14.2
+pypdf==6.0.0
+pytest==9.1.1
+pytest-asyncio==1.2.0
+pytest-cov==7.1.0
+PyYAML==6.0.2
+ruff==0.15.22
+SQLAlchemy==2.0.51
+structlog==24.2.0
+typer==0.27.0
+types-PyYAML==6.0.12.20250516
+tomli==2.4.1; python_version < "3.11"
+uvicorn==0.46.0
