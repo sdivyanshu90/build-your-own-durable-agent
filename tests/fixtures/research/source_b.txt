@@ -1,0 +1,2 @@
+Independent operational note
+FACT: maximum retries = 5
