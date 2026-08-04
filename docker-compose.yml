@@ -1,0 +1,54 @@
+services:
+  postgres:
+    image: postgres:17.5-alpine
+    environment:
+      POSTGRES_DB: durable_agent
+      POSTGRES_USER: durable_agent
+      POSTGRES_PASSWORD: local-development-only
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U durable_agent"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+  migrate:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["alembic", "upgrade", "head"]
+    environment:
+      DURABLE_AGENT_ENVIRONMENT: production
+      DURABLE_AGENT_DATABASE_URL: postgresql+asyncpg://durable_agent:local-development-only@postgres/durable_agent
+      DURABLE_AGENT_SYNC_DATABASE_URL: postgresql+psycopg://durable_agent:local-development-only@postgres/durable_agent
+      DURABLE_AGENT_REPOSITORY_ROOT: /workspace
+      DURABLE_AGENT_ARTIFACT_DIRECTORY: /data/artifacts
+    volumes:
+      - .:/workspace:ro
+  api:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    environment:
+      DURABLE_AGENT_ENVIRONMENT: production
+      DURABLE_AGENT_DATABASE_URL: postgresql+asyncpg://durable_agent:local-development-only@postgres/durable_agent
+      DURABLE_AGENT_SYNC_DATABASE_URL: postgresql+psycopg://durable_agent:local-development-only@postgres/durable_agent
+      DURABLE_AGENT_ARTIFACT_DIRECTORY: /data/artifacts
+      DURABLE_AGENT_REPOSITORY_ROOT: /workspace
+      DURABLE_AGENT_REQUIRE_API_AUTHENTICATION: "true"
+      DURABLE_AGENT_API_AUTH_TOKEN: ${DURABLE_AGENT_API_AUTH_TOKEN:?set DURABLE_AGENT_API_AUTH_TOKEN}
+      DURABLE_AGENT_API_ALLOWED_OWNERS: '["local"]'
+    ports: ["8000:8000"]
+    volumes:
+      - agent-artifacts:/data/artifacts
+      - .:/workspace:ro
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+volumes:
+  postgres-data:
+  agent-artifacts:
