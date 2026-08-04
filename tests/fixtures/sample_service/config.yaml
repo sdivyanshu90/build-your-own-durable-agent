@@ -1,0 +1,2 @@
+service_name: sample-notifier
+retry_delay_seconds: 0.01
